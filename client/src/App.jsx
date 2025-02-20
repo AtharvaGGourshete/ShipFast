@@ -6,6 +6,8 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import LandingPage from './pages/LandingPage';
+import Login from './pages/Login';
+import Sales from './pages/Sales';
 
 function App() {
   const router = createBrowserRouter([
@@ -17,7 +19,27 @@ function App() {
           <LandingPage />
           <Footer />
         </>
+      )
+    },
+    {
+      path: "/login",
+      element: (
+        <>
+          
+          <Login />
+          
+        </>
       ),
+    },
+    {
+      path: "/sales",
+      element: (
+        <>
+          <Navbar />
+          <Sales />
+          <Footer />
+        </>
+      )
     },
   ]);
 
