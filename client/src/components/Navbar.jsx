@@ -26,24 +26,31 @@ const Navbar = () => {
       <div className="grid grid-cols-2 justify-around font-raleway text-center">
         <div className="flex justify-center">
           <img src={IMAGES.image1} className="h-10 mr-2" />
-
+          <Link to={"/"}>
           <ul className="text-2xl font-bold mt-2">
             Ship
             <LineShadowText className="italic" shadowColor={shadowColor}>
               Fast
             </LineShadowText>
           </ul>
+          </Link>
           <Link to={"/sales"}>
             <ul className="font-semibold hover:text-green-500 cursor-pointer ml-10 items-center mt-3">
-              Succesfull Sales
-            </ul>
-            <ul className="font-semibold hover:text-green-500 cursor-pointer ml-10 items-center mt-3">
-              Orders
+              Sales
             </ul>
           </Link>
+          <Link to={"/orders"}>
+          <ul className="font-semibold hover:text-green-500 cursor-pointer ml-10 items-center mt-3">
+            Orders
+          </ul>
+          </Link>
         </div>
-        <div className="flex gap-5 items-center ml-20">
-          <ul className="cursor-pointer">Home</ul>
+        <div className="flex gap-5 items-center mt-1 ml-20">
+        <Link to={"/"}>
+          <ul>
+            Home
+          </ul>
+          </Link>
           <ul className="cursor-pointer">About Us</ul>
           <ul className="cursor-pointer">Contact Us</ul>
           <Button
@@ -63,7 +70,7 @@ const Navbar = () => {
           <Link to={"https://github.com/AtharvaGGourshete/Hackscript"}>
             <button
               type="button"
-              class="text-white bg-[#24292F] hover:bg-[#24292F]/90 focus:ring-4 focus:outline-none focus:ring-[#24292F]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-gray-500 dark:hover:bg-[#050708]/30 "
+              class="text-white bg-[#24292F] hover:bg-[#24292F]/90 focus:ring-4 focus:outline-none focus:ring-[#24292F]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-gray-500 dark:hover:bg-[#050708]/30 hover:bg-green-500 hover:text-black"
             >
               <svg
                 class="w-4 h-4 me-2"
