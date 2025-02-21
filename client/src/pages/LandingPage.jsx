@@ -61,7 +61,7 @@ const LandingPage = () => {
             shipping hassle-free. Choose ShipFast for speed, reliability, and
             excellence in every delivery.
           </p>
-          <div className="flex gap-5 justify-center items-center">
+          <div className="flex gap-5 justify-center text-black items-center">
             <Button className="bg-green-500 text-black mt-3 hover:bg-white hover:text-black">
               Set up your first delivery
             </Button>
