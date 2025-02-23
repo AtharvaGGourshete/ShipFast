@@ -40,8 +40,7 @@ import {
   TypingIndicator,
 } from "@chatscope/chat-ui-kit-react";
 
-const API_KEY =
-  "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";
+const API_KEY = process.env.API_KEY;
 
 const systemMessage = {
   //  Explain things like you're talking to a software professional with 5 years of experience.
