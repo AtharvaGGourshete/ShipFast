@@ -51,6 +51,11 @@ const Navbar = () => {
             Home
           </ul>
           </Link>
+        <Link to={"/askai"}>
+          <ul>
+            Ask AI
+          </ul>
+          </Link>
           <ul className="cursor-pointer">About Us</ul>
           <ul className="cursor-pointer">Contact Us</ul>
           <Button
