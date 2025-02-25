@@ -40,10 +40,8 @@ import {
   TypingIndicator,
 } from "@chatscope/chat-ui-kit-react";
 
-const API_KEY = process.env.API_KEY;
-
+// System message for the AI assistant
 const systemMessage = {
-  //  Explain things like you're talking to a software professional with 5 years of experience.
   role: "system",
   content:
     "Explain things like you're talking to a software professional with 2 years of experience.",
@@ -52,12 +50,14 @@ const systemMessage = {
 const LandingPage = () => {
   const [messages, setMessages] = useState([
     {
-      message: "Hello, I'm ChatGPT! Ask me anything!",
+      message:
+        "Hello, I'm the ShipFast Assistant! Ask me anything about our shipping services!",
       sentTime: "just now",
       sender: "ChatGPT",
     },
   ]);
   const [isTyping, setIsTyping] = useState(false);
+  const [error, setError] = useState(null);
 
   const handleSend = async (message) => {
     const newMessage = {
@@ -69,66 +69,83 @@ const LandingPage = () => {
     const newMessages = [...messages, newMessage];
 
     setMessages(newMessages);
-
-    // Initial system message to determine ChatGPT functionality
-    // How it responds, how it talks, etc.
     setIsTyping(true);
+    setError(null);
+
     await processMessageToChatGPT(newMessages);
   };
 
+  // Modify the processMessageToChatGPT function in your LandingPage.jsx
+
   async function processMessageToChatGPT(chatMessages) {
-    // messages is an array of messages
-    // Format messages for chatGPT API
-    // API is expecting objects in format of { role: "user" or "assistant", "content": "message here"}
-    // So we need to reformat
-
-    let apiMessages = chatMessages.map((messageObject) => {
-      let role = "";
-      if (messageObject.sender === "ChatGPT") {
-        role = "assistant";
-      } else {
-        role = "user";
-      }
-      return { role: role, content: messageObject.message };
-    });
-
-    // Get the request body set up with the model we plan to use
-    // and the messages which we formatted above. We add a system message in the front to'
-    // determine how we want chatGPT to act.
-    const apiRequestBody = {
-      model: "gpt-3.5-turbo",
-      messages: [
-        systemMessage, // The system message DEFINES the logic of our chatGPT
-        ...apiMessages, // The messages from our chat with ChatGPT
-      ],
-    };
-
-    await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: "Bearer " + API_KEY,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(apiRequestBody),
-    })
-      .then((data) => {
-        return data.json();
-      })
-      .then((data) => {
-        console.log(data);
-        setMessages([
-          ...chatMessages,
-          {
-            message: data.choices[0].message.content,
-            sender: "ChatGPT",
-          },
-        ]);
-        setIsTyping(false);
+    try {
+      let apiMessages = chatMessages.map((messageObject) => {
+        let role = messageObject.sender === "ChatGPT" ? "assistant" : "user";
+        return { role: role, content: messageObject.message };
       });
+
+      // Store your API key in .env file as VITE_API_KEY
+      // This is still not secure for production, but better than hardcoding
+      const chatgay = import.meta.env.VITE_API_KEY;
+
+      if (!chatgay) {
+        throw new Error(
+          "API key not found. Please check your environment variables."
+        );
+      }
+
+      const apiRequestBody = {
+        model: "gpt-3.5-turbo",
+        messages: [systemMessage, ...apiMessages],
+      };
+
+      const response = await fetch(
+        "https://api.openai.com/v1/chat/completions",
+        {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${chatgay}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(apiRequestBody),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      setMessages([
+        ...chatMessages,
+        {
+          message: data.choices[0].message.content,
+          sender: "ChatGPT",
+        },
+      ]);
+      
+    } catch (error) {
+      console.error("Error processing message:", error);
+      setError(
+        error.message || "Failed to get a response. Please try again later."
+      );
+      // Add the error message to the chat
+      setMessages([
+        ...chatMessages,
+        {
+          message:
+            "Sorry, I'm having trouble connecting. Please try again in a moment.",
+          sender: "ChatGPT",
+        },
+      ]);
+    } finally {
+      setIsTyping(false);
+    }
   }
+
   const { resolvedTheme } = useTheme();
   const [shadowColor, setShadowColor] = useState("white");
-  const [date, setDate] = useState(null); // Add this line
+  const [date, setDate] = useState(null);
 
   useEffect(() => {
     setShadowColor(resolvedTheme === "dark" ? "white" : "black");
@@ -136,7 +153,6 @@ const LandingPage = () => {
 
   return (
     <>
-      {/* Google Font Import */}
       <link
         href="https://fonts.googleapis.com/css2?family=Raleway:wght@100..900&display=swap"
         rel="stylesheet"
@@ -158,7 +174,7 @@ const LandingPage = () => {
           <span className="tracking-wide text-2xl">
             Reliable. Efficient. Delivered.
           </span>
-          <p className="tracking-wide text-xl font-raleway ml-72 mr-72 mt-7">
+          <p className="tracking-wide text-xl font-raleway max-w-4xl mx-auto mt-7">
             ShipFast Logistics ensures fast, reliable global deliveries with
             guaranteed on-time shipping. Trusted by businesses worldwide, we
             prioritize efficiency, precision, and customer satisfaction. Backed
@@ -166,7 +182,7 @@ const LandingPage = () => {
             shipping hassle-free. Choose ShipFast for speed, reliability, and
             excellence in every delivery.
           </p>
-          <div className="flex gap-5 justify-center text-black items-center">
+          <div className="flex flex-wrap gap-5 justify-center text-black items-center">
             <Button className="bg-green-500 text-black mt-3 hover:bg-white hover:text-black">
               Set up your first delivery
             </Button>
@@ -235,48 +251,49 @@ const LandingPage = () => {
         </div>
 
         <AlertDialog>
-          <AlertDialogTrigger asChild className="mb-5">
-            <Button variant="outline">Chat with our AI assistant</Button>
-          </AlertDialogTrigger>
-          <AlertDialogContent className="w-1/2 flex justify-center">
-            <div className="App flex justify-center">
-              <div
-                style={{
-                  position: "relative",
-                  height: "600px",
-                  width: "1000px",
-                  zIndex: "30",
-                  borderRadius: "50px"
-                }}
-              >
-                <MainContainer className="p-7 rounded-2xl mb-5">
-                  <ChatContainer className="">
-                    <MessageList
-                      scrollBehavior="smooth"
-                      typingIndicator={
-                        isTyping ? (
-                          <TypingIndicator content="AI is typing" />
-                        ) : null
-                      }
-                    >
-                      {messages.map((message, i) => {
-                        console.log(message);
-                        return <Message key={i} model={message} />;
-                      })}
-                    </MessageList>
-                    <MessageInput
-                      placeholder="Type message here"
-                      onSend={handleSend}
-                    />
-                    
-                  </ChatContainer>
-                </MainContainer>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                
-              </div>
-            </div>
-          </AlertDialogContent>
-        </AlertDialog>
+      <AlertDialogTrigger asChild>
+        <Button variant="outline" className="mb-5 px-6 py-3 rounded-lg text-lg font-semibold shadow-md hover:bg-gray-100 transition">
+          Chat with our AI assistant
+        </Button>
+      </AlertDialogTrigger>
+      <AlertDialogContent className="w-full max-w-5xl p-7 bg-green-400 rounded-lg shadow-2xl text-2xl border ">
+        <AlertDialogHeader className="text-center">
+          <AlertDialogTitle className="text-3xl font-bold tracking-tight text-gray-800 ">ShipFast Assistant</AlertDialogTitle>
+          <AlertDialogDescription className="text-gray-500 text-sm">
+            Ask any questions about our shipping services.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+
+        <div className="flex-1 overflow-hidden">
+          <div className="relative h-[500px] w-full z-30 rounded-lg shadow-inner border">
+            <MainContainer className="rounded-md overflow-hidden h-full p-6">
+              <ChatContainer>
+                <MessageList
+                  scrollBehavior="smooth"
+                  typingIndicator={isTyping ? <TypingIndicator content="Assistant is typing" /> : null}
+                >
+                  {messages.map((message, i) => (
+                    <Message key={i} model={message} />
+                  ))}
+                </MessageList>
+                <MessageInput
+                  placeholder="Type message here..."
+                  onSend={handleSend}
+                  disabled={isTyping}
+                  className="border-t border-gray-300 text-xl"
+                />
+              </ChatContainer>
+            </MainContainer>
+          </div>
+        </div>
+
+        <AlertDialogFooter className="mt-4 flex justify-center">
+          <AlertDialogCancel className="px-4 py-2 bg-gray-200 rounded-md text-gray-700 hover:bg-gray-300 transition">
+            Close
+          </AlertDialogCancel>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
       </div>
     </>
   );

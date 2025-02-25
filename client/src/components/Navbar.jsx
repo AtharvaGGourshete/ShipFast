@@ -29,7 +29,7 @@ const Navbar = () => {
           <Link to={"/"}>
           <ul className="text-2xl font-bold mt-2">
             Ship
-            <LineShadowText className="italic" shadowColor={shadowColor}>
+            <LineShadowText className="italic text-green-400" shadowColor={shadowColor}>
               Fast
             </LineShadowText>
           </ul>
@@ -49,11 +49,6 @@ const Navbar = () => {
         <Link to={"/"}>
           <ul>
             Home
-          </ul>
-          </Link>
-        <Link to={"/askai"}>
-          <ul>
-            Ask AI
           </ul>
           </Link>
           <ul className="cursor-pointer">About Us</ul>
